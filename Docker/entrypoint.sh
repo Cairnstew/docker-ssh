@@ -25,7 +25,7 @@ echo "$AUTHORIZED_KEY" > "$SSH_DIR/authorized_keys"
 
 
 chown -R "$USERNAME:$USERNAME" "$SSH_DIR"
-chown - R "$USERNAME:$USERNAME" "$PROJECT_DIR"
+chown -R "$USERNAME:$USERNAME" "$PROJECT_DIR"
 chmod 700 "$SSH_DIR"
 chmod 700 "$PROJECT_DIR"
 chmod 600 "$SSH_DIR/authorized_keys"
