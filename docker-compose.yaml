@@ -3,7 +3,7 @@ services:
     secrets:
       - password
     build: 
-      context: ./Docker
+      context: ./Docker # Change this to desired build
       dockerfile: Dockerfile
       args:
         - USERNAME=${USERNAME}
@@ -12,10 +12,10 @@ services:
     env_file:
       - .env
     ports:
-      - "8999:22"  # SSH 
+      - "8999:22"  # SSH, Change 8999 to desired port
     volumes:
-      - ./projects:/home/----replace-with-user----/projects
-    deploy:
+      - projects:/opt/projects
+    deploy: #This is allowing GPU access. Needed for my Nixos Server
       resources:
         reservations:
           devices:
@@ -27,3 +27,6 @@ services:
 secrets:
   password:
     file: ./password.txt
+
+volumes:
+  projects: 
