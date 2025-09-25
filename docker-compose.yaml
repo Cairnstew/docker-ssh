@@ -14,7 +14,7 @@ services:
     ports:
       - "8999:22"  # SSH 
     volumes:
-      - projects:/home/----replace-with-user----/projects
+      - ./projects:/home/----replace-with-user----/projects
     deploy:
       resources:
         reservations:
