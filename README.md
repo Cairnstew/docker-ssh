@@ -1,57 +1,62 @@
-# Development Container Setup
+# Docker SSH Server Setup
 
-This project provides a Docker-based development environment, enabling SSH access with secure key-based authentication and GPU support. The setup includes a Dockerfile, Docker Compose configuration, and scripts to automate user and SSH key setup.
+This project provides a Docker-based setup for running a secure SSH server with GPU support, designed for general development environments. It automates SSH key setup, user creation, and container configuration using Docker Compose.
+
+## File Structure
+
+- **`setup.sh`**: Bash script to automate SSH key setup and environment configuration. It prompts for a password, creates a `.env` file, and generates a Docker secret file (`password.txt`).
+- **`docker-compose.yml`**: Defines the Docker service (`docker-ssh`), including SSH port mapping, GPU access, and volume mounts.
+- **`Docker/`**:
+  - **`Dockerfile`**: Base Dockerfile for the main SSH server setup, based on Ubuntu 22.04, with secure SSH configurations and user setup.
+  - **`entrypoint.sh`**: Entry script for the container, sets up SSH keys, user permissions, and starts the SSH server.
+- **`Docker/<specific-use-case>/`** (e.g., `Docker/Python/`):
+  - Contains additional Dockerfiles and `entrypoint.sh` scripts tailored for specific use cases (e.g., Python development).
+  - Each subfolder includes its own `Dockerfile` and `entrypoint.sh` for specialized configurations.
 
 ## Prerequisites
 
-- **Docker**: Ensure Docker and Docker Compose are installed on your system.
-- **SSH Keys**: Generate an SSH key pair (`id_rsa` or `id_ed25519`) on your client machine if you don't already have one.
-- **GPU Drivers**: NVIDIA GPU drivers and the NVIDIA Container Toolkit must be installed for GPU support.
-
-## Files Overview
-
-- **Dockerfile**: Builds a container based on `ubuntu:22.04` with SSH server, essential tools (`git`, `sudo`, etc.), and user setup.
-- **entrypoint.sh**: Configures SSH keys, user permissions, and starts the SSH server.
-- **setup.sh**: Automates environment setup, including creating a `.env` file and a Docker secret for the password.
-- **docker-compose.yaml**: Defines the `docker-ssh` service with SSH port mapping, GPU support, and volume for project persistence.
+- **Docker** and **Docker Compose** installed on your system.
+- An SSH public key (`~/.ssh/id_rsa.pub` or `~/.ssh/id_ed25519.pub`) from your client machine.
+- For GPU support, ensure NVIDIA drivers and the NVIDIA Container Toolkit are installed (required for `cdi` driver in `docker-compose.yml`).
 
 ## Setup Instructions
 
 1. **Clone the Repository**
-
    ```bash
-   git clone https://github.com/Cairnstew/docker-ssh.git
-   cd https://github.com/Cairnstew/docker-ssh.git
+   git clone <repository-url>
+   cd <repository-directory>
    ```
 
 2. **Run the Setup Script**
-
-   Execute the `setup.sh` script to configure the environment:
-
-   ```bash
-   chmod +x setup.sh
-   ./setup.sh
-   ```
-
-   - The script prompts for a password for the SSH user (your system username).
-   - It creates a `.env` file with the `USERNAME` variable and a `password.txt` file as a Docker secret.
+   - Execute the `setup.sh` script to configure the environment:
+     ```bash
+     chmod +x setup.sh
+     ./setup.sh
+     ```
+   - Enter a password when prompted. This will create:
+     - A `.env` file with the username.
+     - A `password.txt` file as a Docker secret.
 
 3. **Add Your SSH Public Key**
-
    - Retrieve your SSH public key from your client machine:
      ```bash
+     # Linux/MacOS/Git Bash
      cat ~/.ssh/id_rsa.pub
-     ```
-     or, for Ed25519 keys:
-     ```bash
+     # or
      cat ~/.ssh/id_ed25519.pub
      ```
-
-     For Windows:
-     - PowerShell: `Get-Content $env:USERPROFILE\.ssh\id_rsa.pub`
-     - Command Prompt: `type %USERPROFILE%\.ssh\id_rsa.pub`
-     - Git Bash: Same as Linux commands.
-
+     ```powershell
+     # Windows PowerShell
+     Get-Content $env:USERPROFILE\.ssh\id_rsa.pub
+     # or
+     Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub
+     ```
+     ```cmd
+     # Windows Command Prompt
+     type %USERPROFILE%\.ssh\id_rsa.pub
+     # or
+     type %USERPROFILE%\.ssh\id_ed25519.pub
+     ```
    - Edit the `.env` file and add your SSH public key to the `AUTHORIZED_KEY` variable:
      ```bash
      nano .env
@@ -59,75 +64,46 @@ This project provides a Docker-based development environment, enabling SSH acces
      Example:
      ```
      USERNAME=your-username
-     AUTHORIZED_KEY="ssh-rsa AAAAB3NzaC1yc2E... your-comment"
+     AUTHORIZED_KEY="ssh-rsa AAAAB3NzaC1yc2E... your-key-comment"
      ```
 
-4. **Update docker-compose.yaml**
-
-   - Replace the placeholder `----replace-with-user----` in the `volumes` section with your username:
-     ```yaml
-     volumes:
-       - projects:/home/your-username/projects
+4. **Start the Container**
+   - Run the Docker Compose command to start the container:
+     ```bash
+     docker-compose -f docker-compose.yml up -d
      ```
+   - The container (`docker-ssh`) will start with SSH exposed on port `8999` (configurable in `docker-compose.yml`).
 
-5. **Start the Container**
+5. **Connect to the Container**
+   - Use SSH to connect to the container:
+     ```bash
+     ssh -p 8999 <USERNAME>@localhost
+     ```
+   - The password is the one you provided during the `setup.sh` execution, but SSH key authentication is preferred (PasswordAuthentication is disabled by default).
 
-   Launch the container using Docker Compose:
+## Customizing for Specific Use Cases
 
-   ```bash
-   docker-compose -f docker-compose.yaml up -d
-   ```
+- The `Docker/` directory supports modular configurations for different use cases (e.g., `Docker/Python/`).
+- To use a specific configuration:
+  1. Update the `build.context` in `docker-compose.yml` to point to the desired folder (e.g., `./Docker/Python`).
+  2. Ensure the corresponding `Dockerfile` and `entrypoint.sh` are present in that folder.
+  3. Re-run `docker-compose up -d`.
 
-6. **Access the Container**
+## Notes
 
-   Connect to the container via SSH:
-
-   ```bash
-   ssh -p 8999 your-username@localhost
-   ```
-
-   - The SSH server runs on port `8999`.
-   - Use your private SSH key for authentication (password authentication is disabled).
-
-## Directory Structure
-
-- `/home/$USERNAME/projects`: Persistent volume for your project files.
-- `/home/$USERNAME/.ssh`: Contains the `authorized_keys` file for SSH access.
-
-## Security Notes
-
-- **Password Authentication**: Disabled in the SSH configuration for enhanced security.
-- **SSH Key**: Only the provided public key in the `.env` file is authorized.
-- **Password Secret**: Stored securely as a Docker secret (`password.txt`).
+- **Security**: The `Dockerfile` disables root login and password authentication, enforcing SSH key-based access for security.
+- **GPU Support**: The `docker-compose.yml` includes GPU access via the `cdi` driver for NVIDIA GPUs. Ensure your system supports this.
+- **Volumes**: The `/opt/projects` directory is mounted as a volume for persistent project data.
+- **Port Configuration**: The SSH port is set to `8999` by default. Modify the `ports` section in `docker-compose.yml` if needed.
 
 ## Troubleshooting
 
 - **SSH Connection Issues**:
-  - Ensure your SSH public key is correctly set in the `.env` file.
-  - Verify the SSH port (`8999`) is not blocked by a firewall.
-  - Check container logs: `docker logs docker-ssh`.
-- **GPU Issues**:
+  - Verify the `AUTHORIZED_KEY` in the `.env` file matches your public key.
+  - Ensure the SSH port (`8999`) is not blocked by your firewall.
+- **GPU Errors**:
   - Confirm NVIDIA Container Toolkit is installed and configured.
-  - Ensure `nvidia.com/gpu=all` is supported by your system.
-- **Permission Errors**:
-  - Verify the `USERNAME` in `.env` matches the volume path in `docker-compose.yaml`.
-
-## Cleanup
-
-To stop and remove the container:
-
-```bash
-docker-compose -f docker-compose.yaml down
-```
-
-To remove the Docker image:
-
-```bash
-docker rmi docker-ssh
-```
-
-## Notes
-
-- The container is configured to restart unless explicitly stopped (`restart: unless-stopped`).
-- The `projects` volume persists data even if the container is removed.
-- For additional tools or dependencies, modify the `Dockerfile` and rebuild the image.
+  - Check that `nvidia.com/gpu=all` is valid for your system.
+- **Container Fails to Start**:
+  - Check logs with `docker logs docker-ssh`.
+  - Ensure `password.txt` and `.env` files are correctly set up.
