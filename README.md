@@ -20,8 +20,8 @@ This project provides a Docker-based development environment, enabling SSH acces
 1. **Clone the Repository**
 
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone https://github.com/Cairnstew/docker-ssh.git
+   cd https://github.com/Cairnstew/docker-ssh.git
    ```
 
 2. **Run the Setup Script**
