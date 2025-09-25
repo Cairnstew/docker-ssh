@@ -13,7 +13,7 @@ This project provides a Docker-based development environment, enabling SSH acces
 - **Dockerfile**: Builds a container based on `ubuntu:22.04` with SSH server, essential tools (`git`, `sudo`, etc.), and user setup.
 - **entrypoint.sh**: Configures SSH keys, user permissions, and starts the SSH server.
 - **setup.sh**: Automates environment setup, including creating a `.env` file and a Docker secret for the password.
-- **docker-compose.yaml**: Defines the `gym-dev` service with SSH port mapping, GPU support, and volume for project persistence.
+- **docker-compose.yaml**: Defines the `docker-ssh` service with SSH port mapping, GPU support, and volume for project persistence.
 
 ## Setup Instructions
 
@@ -105,7 +105,7 @@ This project provides a Docker-based development environment, enabling SSH acces
 - **SSH Connection Issues**:
   - Ensure your SSH public key is correctly set in the `.env` file.
   - Verify the SSH port (`8999`) is not blocked by a firewall.
-  - Check container logs: `docker logs gym-dev`.
+  - Check container logs: `docker logs docker-ssh`.
 - **GPU Issues**:
   - Confirm NVIDIA Container Toolkit is installed and configured.
   - Ensure `nvidia.com/gpu=all` is supported by your system.
@@ -123,7 +123,7 @@ docker-compose -f docker-compose.yaml down
 To remove the Docker image:
 
 ```bash
-docker rmi gym-dev
+docker rmi docker-ssh
 ```
 
 ## Notes
