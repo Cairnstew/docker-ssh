@@ -1,0 +1,29 @@
+services:
+  gym-dev:
+    secrets:
+      - password
+    build: 
+      context: ./Docker
+      dockerfile: Dockerfile
+      args:
+        - USERNAME=${USERNAME}
+    container_name: gym-dev
+    restart: unless-stopped
+    env_file:
+      - .env
+    ports:
+      - "8999:22"  # SSH 
+    volumes:
+      - projects:/home/----replace-with-user----/projects
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: cdi
+            capabilities:
+              - gpu
+            device_ids:
+              - nvidia.com/gpu=all
+secrets:
+  password:
+    file: ./password.txt
