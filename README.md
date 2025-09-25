@@ -23,8 +23,8 @@ This project provides a Docker-based setup for running a secure SSH server with 
 
 1. **Clone the Repository**
    ```bash
-   git clone <repository-url>
-   cd <repository-directory>
+   git clone https://github.com/Cairnstew/docker-ssh.git
+   cd docker-ssh
    ```
 
 2. **Run the Setup Script**
