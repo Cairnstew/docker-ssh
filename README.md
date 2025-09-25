@@ -5,7 +5,7 @@ This project provides a Docker-based setup for running a secure SSH server with 
 ## File Structure
 
 - **`setup.sh`**: Bash script to automate SSH key setup and environment configuration. It prompts for a password, creates a `.env` file, and generates a Docker secret file (`password.txt`).
-- **`docker-compose.yml`**: Defines the Docker service (`docker-ssh`), including SSH port mapping, GPU access, and volume mounts.
+- **`docker-compose.yaml`**: Defines the Docker service (`docker-ssh`), including SSH port mapping, GPU access, and volume mounts.
 - **`Docker/`**:
   - **`Dockerfile`**: Base Dockerfile for the main SSH server setup, based on Ubuntu 22.04, with secure SSH configurations and user setup.
   - **`entrypoint.sh`**: Entry script for the container, sets up SSH keys, user permissions, and starts the SSH server.
@@ -17,7 +17,7 @@ This project provides a Docker-based setup for running a secure SSH server with 
 
 - **Docker** and **Docker Compose** installed on your system.
 - An SSH public key (`~/.ssh/id_rsa.pub` or `~/.ssh/id_ed25519.pub`) from your client machine.
-- For GPU support, ensure NVIDIA drivers and the NVIDIA Container Toolkit are installed (required for `cdi` driver in `docker-compose.yml`).
+- For GPU support, ensure NVIDIA drivers and the NVIDIA Container Toolkit are installed (required for `cdi` driver in `docker-compose.yaml`).
 
 ## Setup Instructions
 
@@ -70,9 +70,9 @@ This project provides a Docker-based setup for running a secure SSH server with 
 4. **Start the Container**
    - Run the Docker Compose command to start the container:
      ```bash
-     docker-compose -f docker-compose.yml up -d
+     docker-compose -f docker-compose.yaml up -d
      ```
-   - The container (`docker-ssh`) will start with SSH exposed on port `8999` (configurable in `docker-compose.yml`).
+   - The container (`docker-ssh`) will start with SSH exposed on port `8999` (configurable in `docker-compose.yaml`).
 
 5. **Connect to the Container**
    - Use SSH to connect to the container:
@@ -85,16 +85,16 @@ This project provides a Docker-based setup for running a secure SSH server with 
 
 - The `Docker/` directory supports modular configurations for different use cases (e.g., `Docker/Python/`).
 - To use a specific configuration:
-  1. Update the `build.context` in `docker-compose.yml` to point to the desired folder (e.g., `./Docker/Python`).
+  1. Update the `build.context` in `docker-compose.yaml` to point to the desired folder (e.g., `./Docker/Python`).
   2. Ensure the corresponding `Dockerfile` and `entrypoint.sh` are present in that folder.
   3. Re-run `docker-compose up -d`.
 
 ## Notes
 
 - **Security**: The `Dockerfile` disables root login and password authentication, enforcing SSH key-based access for security.
-- **GPU Support**: The `docker-compose.yml` includes GPU access via the `cdi` driver for NVIDIA GPUs. Ensure your system supports this.
+- **GPU Support**: The `docker-compose.yaml` includes GPU access via the `cdi` driver for NVIDIA GPUs. Ensure your system supports this.
 - **Volumes**: The `/opt/projects` directory is mounted as a volume for persistent project data.
-- **Port Configuration**: The SSH port is set to `8999` by default. Modify the `ports` section in `docker-compose.yml` if needed.
+- **Port Configuration**: The SSH port is set to `8999` by default. Modify the `ports` section in `docker-compose.yaml` if needed.
 
 ## Troubleshooting
 
