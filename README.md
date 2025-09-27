@@ -39,7 +39,65 @@ This project provides a Docker-based setup for running a secure SSH server with 
    - `.env`: Environment variables (username and placeholder for authorized keys).
    - `password.txt`: Secret file containing the SSH user password (restricted permissions).
 
-4. **Start the Container**:
+4. **Add Your SSH Public Key**
+
+   - Retrieve your SSH public key from your client machine:
+
+     ```bash
+
+     # Linux/MacOS/Git Bash
+
+     cat ~/.ssh/id_rsa.pub
+
+     # or
+
+     cat ~/.ssh/id_ed25519.pub
+
+     ```
+
+     ```powershell
+
+     # Windows PowerShell
+
+     Get-Content $env:USERPROFILE\.ssh\id_rsa.pub
+
+     # or
+
+     Get-Content $env:USERPROFILE\.ssh\id_ed25519.pub
+
+     ```
+
+     ```cmd
+
+     # Windows Command Prompt
+
+     type %USERPROFILE%\.ssh\id_rsa.pub
+
+     # or
+
+     type %USERPROFILE%\.ssh\id_ed25519.pub
+
+     ```
+
+   - Edit the `.env` file and add your SSH public key to the `AUTHORIZED_KEY` variable:
+
+     ```bash
+
+     nano .env
+
+     ```
+
+     Example:
+
+     ```
+
+     USERNAME=your-username
+
+     AUTHORIZED_KEY="ssh-rsa AAAAB3NzaC1yc2E... your-key-comment"
+
+     ```
+
+5. **Start the Container**:
    ```bash
    docker-compose -f docker-compose.yml up -d
    ```
