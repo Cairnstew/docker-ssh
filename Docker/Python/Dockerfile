@@ -24,6 +24,9 @@ RUN apt update --assume-yes && \
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
 
+# Pip Install
+RUN python3 -m pip install uv
+
 # Create group and user by name only, if they don't already exist
 RUN groupadd -g ${USER_GID} ${USERNAME} && \
     useradd -m -u ${USER_UID} -g ${USER_GID} -s /bin/bash ${USERNAME}
