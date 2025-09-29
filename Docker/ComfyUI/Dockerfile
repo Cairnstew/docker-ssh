@@ -83,6 +83,7 @@ RUN /opt/conda/bin/pip install \
 RUN /opt/conda/bin/pip install ipykernel
 
 EXPOSE 22
+EXPOSE 8188
 
 ADD entrypoint.sh /entrypoint.sh
 
