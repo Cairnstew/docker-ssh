@@ -19,15 +19,17 @@ unset PASSWORD
 
 SSH_DIR="/home/$USERNAME/.ssh"
 PROJECT_DIR="/opt/projects"
+
+
 mkdir -p "$SSH_DIR"
 mkdir -p "$PROJECT_DIR"
+
+
 echo "$AUTHORIZED_KEY" > "$SSH_DIR/authorized_keys"
 
-
-chown -R "$USERNAME:$USERNAME" "$SSH_DIR"
-chown -R "$USERNAME:$USERNAME" "$PROJECT_DIR"
-chmod 700 "$SSH_DIR"
-chmod 700 "$PROJECT_DIR"
+# Permissions
+chown -R "$USERNAME:$USERNAME" "$SSH_DIR" "$PROJECT_DIR"
+chmod 700 "$SSH_DIR" "$PROJECT_DIR"
 chmod 600 "$SSH_DIR/authorized_keys"
 
 echo "SSH key for user '$USERNAME' has been set up."
@@ -35,6 +37,15 @@ echo "SSH Key: '$AUTHORIZED_KEY'"
 
 ssh-keygen -A
 
+sudo -u "$USERNAME" bash -c "(
+  cd ${PROJECT_DIR} || exit
+  uv venv --seed --python 3.12
+  uv pip install comfy-cli
+  uv run comfy --skip-prompt --workspace=${PROJECT_DIR}/ComfyUI install --nvidia
+  git clone https://github.com/Chaoses-Ib/ComfyScript.git ${PROJECT_DIR}/ComfyUI/custom_nodes/ComfyScript
+  uv pip install -e \"./ComfyUI/custom_nodes/ComfyScript[default]\"
+  uv pip install ipykernel
+)"
+
 echo "[entry.sh] Starting SSH server..."
 /usr/sbin/sshd -D
-

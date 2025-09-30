@@ -23,7 +23,6 @@ RUN apt update --assume-yes && \
 # Set python3 as the default python
 RUN update-alternatives --install /usr/bin/python python /usr/bin/python3 1
 
-
 # Pip Install
 RUN python3 -m pip install uv
 
@@ -40,16 +39,6 @@ RUN usermod -aG sudo "${USERNAME}" && \
     sed -i 's/^#\?PubkeyAuthentication .*/PubkeyAuthentication yes/' /etc/ssh/sshd_config || echo 'PubkeyAuthentication yes' >> /etc/ssh/sshd_config && \
     sed -i 's|^#\?AuthorizedKeysFile .*|AuthorizedKeysFile .ssh/authorized_keys|' /etc/ssh/sshd_config || echo 'AuthorizedKeysFile .ssh/authorized_keys' >> /etc/ssh/sshd_config && \
     grep -q '^PubkeyAcceptedAlgorithms' /etc/ssh/sshd_config || echo 'PubkeyAcceptedAlgorithms +ssh-rsa' >> /etc/ssh/sshd_config
-
-
-
-RUN mkdir /opt/ComfyUI
-RUN cd ComfyUI && \
-    uv venv --seed --python 3.12 \
-    uv pip install comfy-cli \
-    uv run comfy --workspace . install \
-    git clone https://github.com/Chaoses-Ib/ComfyScript.git ./custom_nodes/ComfyScript \
-    uv pip install -e "./custom_nodes/ComfyScript[default]"
 
 
 EXPOSE 22
